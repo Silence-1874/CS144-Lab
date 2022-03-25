@@ -53,3 +53,20 @@ Hello, CS144!
   ![202203231714322.png](https://s2.loli.net/2022/03/24/w3iCdbymHqtfzA9.png)
 8. 检查邮箱，发现邮件成功发送。
   ![202203231734710.png](https://s2.loli.net/2022/03/24/IdOAm2ZezgBWEtN.png)
+
+### 2.3 Listening and connecting
+1. 在终端输入`netcat -v -l -p 9090`，提示`netcat: getnameinfo: Temporary failure in name resolution`。
+  ![](https://s2.loli.net/2022/03/25/W6hfcQTtRd1mbua.png)
+  查阅资料后，得知需要加在中间加`-n`参数。
+  ![](https://s2.loli.net/2022/03/25/rPqhSdQc81oGCYH.png)
+2. 开启另一个终端，输入`telnet localhost 9090`。
+  ![](https://s2.loli.net/2022/03/25/SiwQmGdZ58vJugj.png)
+3. 原窗口出现`Connection received on 127.0.0.1 38076`。
+  ![](https://s2.loli.net/2022/03/25/2LOQ3Fz7JZUbWvn.png)
+4. 服务端(netcat)和客户端(telnet)可以互相发送消息。
+  - 在客户端中输入消息，按回车后，服务端会出现同样的消息。
+  ![](https://s2.loli.net/2022/03/25/ZrxcwiLSQYnF2pz.png)
+  - 反之亦然。
+  ![](https://s2.loli.net/2022/03/25/bDJQXxBGha4pdMF.png)
+5. 在服务端输入`Ctrl C`关闭程序，客户端也随之关闭。
+  ![](https://s2.loli.net/2022/03/25/EaM6j5L3TYtsQPw.png)
