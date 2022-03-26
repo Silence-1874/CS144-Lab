@@ -35,24 +35,24 @@ Hello, CS144!
 ![202203231605607.png](https://s2.loli.net/2022/03/24/923Ua74KWJqpznE.png)
 于是换用QQ邮箱(`smtp.qq.com`)，中间遇到了好多问题，网上找了好久资料才解决，将近花了一个小时，在这里不一一列举了。
 1. 连接qq邮箱服务器: `telnet smtp.qq.com smtp`。
-  ![202203231655442.png](https://s2.loli.net/2022/03/24/XKzMaZIf1oLDks4.png)
+![202203231655442.png](https://s2.loli.net/2022/03/24/XKzMaZIf1oLDks4.png)
 2. 用`HELO`命令打招呼: `HELO smtp.qq.com smtp`。
-  ![202203231656519.png](https://s2.loli.net/2022/03/24/SFObPVvLKsx6DRQ.png)
+![202203231656519.png](https://s2.loli.net/2022/03/24/SFObPVvLKsx6DRQ.png)
 3. 登录并验证: `AUTH LOGINI`。
-  ![](https://s2.loli.net/2022/03/24/v58F2aYjKokzMEn.png)
+![](https://s2.loli.net/2022/03/24/v58F2aYjKokzMEn.png)
   `VXNlcm5hbWU6`和`UGFzc3dvcmQ6`经过base64解码后分别为`Username:`和`Password:`。
   此处的`Password`并非密码，而是邮箱的**授权码**。
   分别输入用户名和授权码(**都需要用base64加密后输入，不要输入任何多余的空格**)。
 4. 输入发送方和接收方(**`<` 和 `>` 不能省！**）。
-  ![202203231658677.png](https://s2.loli.net/2022/03/24/8NdYoRkOMnf3taL.png)
+![202203231658677.png](https://s2.loli.net/2022/03/24/8NdYoRkOMnf3taL.png)
 5. 输入`DATA`，准备发送数据。
-  ![202203231711436.png](https://s2.loli.net/2022/03/24/aAirnVskxzb2oFe.png)
+![202203231711436.png](https://s2.loli.net/2022/03/24/aAirnVskxzb2oFe.png)
 6. 输入`From`, `To`和`Subject: `，空一行后输入正文，最后以一个`.`表示邮件结束，发送邮件。
-  ![202203231728846.png](https://s2.loli.net/2022/03/24/EWLvhou24jkQxtc.png)
+![202203231728846.png](https://s2.loli.net/2022/03/24/EWLvhou24jkQxtc.png)
 7. 最后输入`QUIT`退出，结束会话。
-  ![202203231714322.png](https://s2.loli.net/2022/03/24/w3iCdbymHqtfzA9.png)
+![202203231714322.png](https://s2.loli.net/2022/03/24/w3iCdbymHqtfzA9.png)
 8. 检查邮箱，发现邮件成功发送。
-  ![202203231734710.png](https://s2.loli.net/2022/03/24/IdOAm2ZezgBWEtN.png)
+![202203231734710.png](https://s2.loli.net/2022/03/24/IdOAm2ZezgBWEtN.png)
 
 ### 2.3 Listening and connecting
 1. 在终端输入`netcat -v -l -p 9090`，提示`netcat: getnameinfo: Temporary failure in name resolution`。
@@ -70,3 +70,27 @@ Hello, CS144!
   ![](https://s2.loli.net/2022/03/25/bDJQXxBGha4pdMF.png)
 5. 在服务端输入`Ctrl C`关闭程序，客户端也随之关闭。
   ![](https://s2.loli.net/2022/03/25/EaM6j5L3TYtsQPw.png)
+
+## 3.Writing a network program using an OS stream socket
+在`webget.cc`里完成`get_URL()`函数，实现类似于`2.1 Fetch a Web page`中的功能。
+一开始感觉完全无从下手，于是按着实验讲义的提示，去看了下实验文件中的`file_descriptor.hh`, `socket.hh`, `address.hh`。（个人感觉结合着官方提供的[API文档](https://cs144.github.io/doc/lab0/annotated.html)来看更好，干啃源码有点难顶）
+看完以后还是很懵，想起来都还没好好看`webget.cc`文件，读完其中的`main`函数才发现，读取命令行参数什么的都已经实现好了，所以著需要创建本机(`127.0.0.1`)与`host`之间的TCP套接字`sock`，建立TCP连接，向将请求数据通过向`sock`中`write()`发送到服务器，最后从`sock`中`read()`出服务器发回的响应信息并打印即可。
+
+> [Address Class Reference](https://cs144.github.io/doc/lab0/class_address.html#a05f9af41381d22e7df2fb4073b590c53)
+> [TCPSocket Class Reference](https://cs144.github.io/doc/lab0/class_t_c_p_socket.html)
+> 这两个文档下都有个**Detailed Description**，仔细阅读，对写代码很有帮助。
+
+检查命令使用，在`build`目录下`make`后，输入`./apps/webget cs144.keithw.org /hello`，打印结果跟`2.1 Fetch a Web page`中通过命令行工具`telnet`获得的响应基本一致(只有`Date`不同)。
+![](https://s2.loli.net/2022/03/26/EOMTVcCn7oZ56dg.png)
+输入`make check_webget`后报错了，可以看到第六行显示`[permission denied] `。
+![](https://s2.loli.net/2022/03/26/VGZqxQL14HoRKyN.png)
+找了一圈，去虚拟机里把`webget_t.sh`这个文件的权限打开。
+![](https://s2.loli.net/2022/03/26/fiqwWTLZeB5jNzC.png)
+再次运行，这次显示的是`No such file or directory`。
+![](https://s2.loli.net/2022/03/26/1o2PhtTxUGYgHzL.png)
+这里需要修改`tests/webget_t.sh`文件中的路径，把其中的`./apps/webget`改成自己的路径(从`/home`开始一直到`build`下的`apps/webget`)即可。
+![](https://s2.loli.net/2022/03/26/U9KIM7Jw81CZNFg.png)
+终于通过了……
+
+最后来一个“梦幻联动”玩玩：
+![](https://s2.loli.net/2022/03/26/TPAdzXrnHekFUhp.png)
