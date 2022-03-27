@@ -94,3 +94,36 @@ Hello, CS144!
 
 最后来一个“梦幻联动”玩玩：
 ![](https://s2.loli.net/2022/03/26/TPAdzXrnHekFUhp.png)
+
+## 4.An in-memory reliable byte stream
+实现一个可靠字节流的类。
+完成`byte_stream.hh`和`byte_stream.cc`即可。
+这里建议倒着写，写到`read()`前，再从头开始写。
+ - `size_t write(const std::string &data)`
+  将数据写入stream中，如果stream剩余容量不够，就写满为止，然后标记写入结束。
+  不用考虑总共要写多少，stream的长度是不确定的，动态的，因此这个write函数只需要关注一次写入的过程即可。
+  记得更新总写入计数器。
+ - `std::string read(const size_t len)`
+  从stream中读出长度为len的数据，如果stream中的数据长度小于len，则将stream中的数据全部读出。
+  记得更新总读出计数器。
+笔者使用了双端队列(`std::deque`)作为基本的数据结构。下面是笔者在`byte_stream.hh`中添加的成员变量。
+```cpp
+    std::deque<char> _buf{};
+    size_t _buf_capacity{};
+    size_t _total_written{0};
+    size_t _total_read{0};
+    bool _end_input{};
+```
+> 添加`_buf_capacity`是因为初始化的时候并不是真的建立一个固定容量的`deque`，而是要在初始化列表中初始化`_buf_capacity`，以此作为stream的容量。
+
+实现不难，熟悉一下C++中的`std::string`和`std::deque`就好了，虽然笔者还是花了很多时间（对C++真不熟啊……/摊手）。
+学到一个新函数`string::assign`。
+要注意分清`deque`的**front**和**back**。
+![](https://s2.loli.net/2022/03/27/zyR7Sg2DfWaPGvZ.png)
+可以发现，比较耗时的Test是`Test #29`，好奇查了一下对应的`byte_stream_capacity`。
+![](https://s2.loli.net/2022/03/27/1EmsnPMJlCvYeiG.png)
+从第72行的`test_name`——**long-stream**可以推测出是一个长流输入，下面for循环的次数也可以看出来，所以耗时较长。
+
+> 终于写完了Lab0，前前后后用了将近一个星期。主要时间花在了环境配置，阅读实验讲义以及学习C++语法上。
+> 英文阅读速度还有待提高，C++嘛……就边用边查吧，毕竟笔者主写Java。
+> 这个星期其他时间基本都花在了阅读《深入理解Java虚拟机》上，好在已经读完了，接下来能稍微空出点时间了，后面的实验要抓紧完成了，争取能在三个星期内前完成吧，最差也要在一个月内完成。
