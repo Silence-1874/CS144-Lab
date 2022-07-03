@@ -12,8 +12,12 @@
 class StreamReassembler {
   private:
     // Your code here -- add private members as necessary.
+    // 管理unassembled窗口
     std::map<size_t, char> _map;
+    // 记录最后一个字符的绝对索引
     size_t _last;
+    // 记录是否出现过eof
+    bool _eof;
 
     ByteStream _output;  //!< The reassembled in-order byte stream
     size_t _capacity;    //!< The maximum number of bytes
