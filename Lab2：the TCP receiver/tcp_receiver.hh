@@ -20,6 +20,12 @@ class TCPReceiver {
     //! The maximum number of bytes we'll store.
     size_t _capacity;
 
+    // 初始序号
+    WrappingInt32 _isn;
+
+    // 是否建立连接
+    bool _syn;
+
   public:
     //! \brief Construct a TCP receiver
     //!
